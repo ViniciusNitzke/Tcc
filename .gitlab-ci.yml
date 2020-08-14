@@ -1,0 +1,29 @@
+stages:
+  - test
+  - deploy
+
+before_script:
+  - pip install pipenv
+  - pipenv install --system --dev
+
+test:
+  image: python:3.8
+  stage: test
+  script:
+    - pipenv run pytest --cov=app/
+
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+
+pages:
+  before_script:
+    - ''
+  stage: deploy
+  script:
+    - mv -v htmlcov/ public/
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+  only:
+    - master
+    - develop
